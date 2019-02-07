@@ -1,9 +1,14 @@
-Installation using maven
+
+
+# Installation using maven
 
 mvn clean package install
 
 
-# pal-1.5
+# pal-1.5.1
+
+
+
 The following is taken from http://iubio.bio.indiana.edu/soft/molbio/evolve/pal/pal.html
 
 
