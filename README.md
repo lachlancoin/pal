@@ -1,9 +1,16 @@
-Installation using maven
+
+
+# Installation using maven
 
 mvn clean package install
 
 
-# pal-1.5
+# pal-1.5.1
+
+This package was downloaded from https://web.archive.org/web/20041204185511/http://www.cebl.auckland.ac.nz/pal-project/download.html , and uploaded to github.  I added a pom.xml so that it could compile using Maven.  
+
+
+
 The following is taken from http://iubio.bio.indiana.edu/soft/molbio/evolve/pal/pal.html
 
 
