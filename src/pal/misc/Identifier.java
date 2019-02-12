@@ -7,10 +7,9 @@
 
 package pal.misc;
 
-import java.io.*;
-import java.util.*;
-import pal.util.Comparable;
-
+import java.io.Serializable;
+import java.util.Vector;
+import pal.misc.NProp;
 /**
  * An identifier for some sampled data. This will most often be
  * for example, the accession number of a DNA sequence, or the
@@ -19,14 +18,34 @@ import pal.util.Comparable;
  * @version $Id: Identifier.java,v 1.9 2002/11/25 05:40:54 matt Exp $
  *
  * @author Alexei Drummond
+ * @author Lachlan Coin
  */
 
 
 public class Identifier implements Serializable,
-					 pal.util.Comparable, Nameable {
+					 pal.util.Comparable,java.lang.Comparable, Nameable {
 
-	private String name = null;
+    static long max_id =-1;
+    
+	private String name = null; //primary identifier
+	private long id;
+    private NProp attributes = new NProp();
+    
+    public void setAttribute(NProp nprop){
+        this.attributes = nprop;
+        this.name = (String) nprop.get(NProp.seq_name);
+    }
+public NProp getProperties(){
+    return attributes;
+}
 
+public void setAttribute(String attr, Object obj){
+    attributes.put(attr, obj);
+}
+
+public Object getAttribute(String attr){
+    return  attributes.get(attr);
+}
 	private static final long serialVersionUID=-7873729831795750538L;
 
 	/** Versioning control... only works with 1.1+ (1.0 should be fine though... this is just pointless that's all) */
@@ -47,21 +66,34 @@ public class Identifier implements Serializable,
 	}
 	public static Identifier ANONYMOUS = new Identifier("");
 
-		public Identifier() {}
+    public Identifier(){
+        this.id = max_id+1;
+        max_id++;
+    }
+		public Identifier(long id) {
+		    this.id = id;
+            max_id = Math.max(id, this.max_id);
+        }
+        public Identifier(String name, long id){
+            this(id);
+            setName(name);
+        }
 
 		public Identifier(String name) {
-	setName(name);
+            this();
+		    setName(name);
 		}
+        
 
 		public String toString() {
-	return getName();
+		    return getName();
 		}
 
 		// implements Comparable interface
 
 		public int compareTo(Object c) {
-
-	return getName().compareTo(((Identifier)c).getName());
+            return getName().compareTo(((Identifier)c).getName());
+	//return getName().compareTo(((Identifier)c).getName());
 		}
 
 		public boolean equals(Object c) {
@@ -78,7 +110,13 @@ public class Identifier implements Serializable,
 		}
 
 		public void setName(String s) {
-	name = s;
+		    name = s;
+           // try{
+           //     Integer.parseInt(s);
+           //     throw new RuntimeException("!! "+s);
+           // }
+          //  catch(NumberFormatException exc){}
+            this.attributes.put(NProp.seq_name, name);
 		}
 	/**
 	 * Translates an array of identifiers into an array of strings
@@ -184,5 +222,18 @@ public class Identifier implements Serializable,
 		names.copyInto(namesFinal);
 		return namesFinal;
 	}
+    public long getID() {
+        return id;
+    }
+    public void setID(long l) {
+       this.id = l;
+        
+    }
+    public void merge(Identifier ident1) {
+        getProperties().merge(ident1.getProperties());
+        
+    }
+    
+    
 }
 
