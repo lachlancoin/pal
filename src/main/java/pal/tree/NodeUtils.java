@@ -799,14 +799,14 @@ public class NodeUtils {
 	}
 
 
-	public static Iterator<Node> depthFirstIterator(final Node root){
+	public static Iterator<Node> preOrderIterator(final Node root){
 		return new Iterator<Node>(){
 			Set<Node> done = new HashSet<Node>();
-			Node curr = root;
+			Node current = root;
 			//int totalNodes = tree.getExternalNodeCount()+tree.getInternalNodeCount();
 			
 			
-			Node next(Node current){
+			Node next(Node curr){
 				 if(!curr.isLeaf()){
 					 for(int i=0; i<curr.getChildCount(); i++){
 						 if(!done.contains(curr.getChild(i))) return curr.getChild(i);
@@ -816,13 +816,19 @@ public class NodeUtils {
 				 return next(curr.getParent());
 			 }
 			public boolean hasNext() {
-				return curr!=null && done.size()>0 && curr!=root;
+				if(current==null) return false;
+				if(done.size()>0) {
+					return current!=root;
+				}
+				else return true;
+				
 			}
 
 			public Node next() {
-				 Node toreturn = curr;
+				 Node toreturn = current;
 				 this.done.add(toreturn);
-				 curr = next(curr);
+				 current = next(current);
+				// System.err.println(toreturn);
 				 return toreturn;
 			}
 			
