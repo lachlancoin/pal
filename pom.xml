@@ -52,7 +52,7 @@
                   				</manifestEntries>
                			 		</transformer>				
               				</transformers>
-              				<finalName>pal1.5</finalName>
+              				<finalName>pal1.5.1.1</finalName>
               				<excludes>
               				</excludes>
               				<includes>

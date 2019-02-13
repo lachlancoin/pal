@@ -799,6 +799,37 @@ public class NodeUtils {
 	}
 
 
+	public static Iterator<Node> depthFirstIterator(final Node root){
+		return new Iterator<Node>(){
+			Set<Node> done = new HashSet<Node>();
+			Node curr = root;
+			//int totalNodes = tree.getExternalNodeCount()+tree.getInternalNodeCount();
+			
+			
+			Node next(Node current){
+				 if(!curr.isLeaf()){
+					 for(int i=0; i<curr.getChildCount(); i++){
+						 if(!done.contains(curr.getChild(i))) return curr.getChild(i);
+					 }
+				 }
+				 if(curr.isRoot()) return null;
+				 return next(curr.getParent());
+			 }
+			public boolean hasNext() {
+				return curr!=null && done.size()>0 && curr!=root;
+			}
+
+			public Node next() {
+				 Node toreturn = curr;
+				 this.done.add(toreturn);
+				 curr = next(curr);
+				 return toreturn;
+			}
+			
+		};
+	}
+	
+	
 	/**
 	 * If the given node or the sub tree defined by that node have negative branch lengths, they'll have
 	 * zeron branch lengths after a call to this function!
@@ -816,3 +847,4 @@ public class NodeUtils {
 		}
 	}
 }
+
