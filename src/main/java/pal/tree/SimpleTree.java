@@ -8,11 +8,21 @@
 
 package pal.tree;
 
-import pal.misc.*;
-import pal.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
 
-import java.io.*;
-import java.util.*;
+import pal.misc.IdGroup;
+import pal.misc.Identifier;
+import pal.misc.LabelMapping;
+import pal.misc.Report;
+import pal.misc.Units;
 
 
 /**
@@ -197,17 +207,64 @@ public class SimpleTree implements Tree, Report, Units, Serializable
 		root = r;
 		createNodeList();
 	}
+	public final void setRoot1(Node r) {
+		root = r;
+		//createNodeList();
+	}
 
+	Set<Node> done = new HashSet<Node>();
+	private void checkPathToRoot(Node node, Node root) {
+		// TODO Auto-generated method stub
+		Node p = node;
+		List<Identifier> n = new ArrayList<Identifier>();
+		while(p!=null){
+			if(p.equals(root)) return;
+			n.add(p.getIdentifier());
+			p = p.getParent();
+		}
+		System.err.println(n);
+		throw new RuntimeException("did not get to root");
+		
+	}
+	List<Node> internal = new ArrayList<Node>();
+	List<Node> external=  new ArrayList<Node>();
+	public void addNode(Node n){
+		if(n.isLeaf()){
+			n.setNumber(external.size());
+			external.add(n);
+		}else{
+			n.setNumber(internal.size());
+			internal.add(n);
+			for(int i=0; i<n.getChildCount(); i++){
+				addNode(n.getChild(i));
+			}
+		}
+	}
+	
+	
 	/** count and list external and internal nodes and
 		compute heights of each node */
 	public void createNodeList()
 	{
-		numInternalNodes = 0;
-		numExternalNodes = 0;
-		Node node = root;
+		//done.clear();
+		addNode(root);
+		numInternalNodes = internal.size();
+		numExternalNodes = external.size();
+		/*Node node = root;
+		done.add(node);
 		do
 		{
 			node = NodeUtils.postorderSuccessor(node);
+			//checkPathToRoot(node, root);
+			if(done.contains(node) && node!=root){
+				System.err.println(node.getChildCount());
+				System.err.println(node.isLeaf());
+				throw new RuntimeException("repeat "+node.getIdentifier());
+			}else{
+				done.add(node);
+			}
+			System.err.println(node.getIdentifier());
+			
 			if (node.isLeaf())
 			{
 				node.setNumber(numExternalNodes);
@@ -219,7 +276,7 @@ public class SimpleTree implements Tree, Report, Units, Serializable
 				numInternalNodes++;
 			}
 		}
-		while(node != root);
+		while(!node.isRoot());
 
 		internalNode = new Node[numInternalNodes];
 		externalNode = new Node[numExternalNodes];
@@ -235,8 +292,10 @@ public class SimpleTree implements Tree, Report, Units, Serializable
 			{
 				internalNode[node.getNumber()] = node;
 			}
-		}
-		while(node != root);
+		}*/
+		internalNode = internal.toArray(new Node[0]);
+		externalNode = external.toArray(new Node[0]);
+	//	while(node != root);
 
 		// compute heights if it seems necessary
 		if (root.getNodeHeight() == 0.0) {
@@ -244,6 +303,7 @@ public class SimpleTree implements Tree, Report, Units, Serializable
 		}
 	}
 
+	
 	public String toString() {
 		StringWriter sw = new StringWriter();
 		NodeUtils.printNH(new PrintWriter(sw), getRoot(), true, false, 0, false);
